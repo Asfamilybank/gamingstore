@@ -22,6 +22,9 @@ const mutations = {
   SET_NAME: (state, name) => {
     state.name = name
   },
+  SET_TYPE: (state, type) => {
+    state.type = type
+  },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
   }
@@ -30,11 +33,12 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { username, password, type } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login(type, { username, password }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
+        commit('SET_TYPE', type)
         setToken(data.token)
         resolve()
       }).catch(error => {
@@ -46,17 +50,14 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getInfo(state.type, state.token).then(response => {
         const { data } = response
-
         if (!data) {
-          return reject('Verification failed, please Login again.')
+          return reject('登录信息失效，请再次登录')
         }
-
-        const { name, avatar } = data
-
+        const { name, type } = data
         commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_TYPE', type)
         resolve(data)
       }).catch(error => {
         reject(error)

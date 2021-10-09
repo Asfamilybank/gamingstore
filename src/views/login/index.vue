@@ -1,51 +1,80 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
+    <el-form
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+      auto-complete="on"
+      label-position="left"
+    >
+      <div class="loginForm-rgba" />
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">登&nbsp;录</h3>
       </div>
-
       <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
+        <el-row>
+          <el-col :span="2">
+            <span class="svg-container">
+              <svg-icon icon-class="user" />
+            </span>
+          </el-col>
+          <el-col :span="15">
+            <el-input
+              v-model="loginForm.username"
+              placeholder="请填写登录名"
+              type="text"
+              tabindex="1"
+            />
+          </el-col>
+          <el-col :span="7">
+            <el-select v-model="select" class="userselect" placeholder="请选择">
+              <el-option label="@管理员" value="admin" />
+              <el-option label="@商家" value="publisher" />
+              <el-option label="@商家成员" value="member" />
+            </el-select>
+          </el-col>
+        </el-row>
       </el-form-item>
-
       <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Password"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-        </span>
+        <el-row>
+          <el-col :span="2">
+            <span class="svg-container">
+              <svg-icon icon-class="password" />
+            </span>
+          </el-col>
+          <el-col :span="17">
+            <el-input
+              :key="passwordType"
+              ref="password"
+              v-model="loginForm.password"
+              :type="passwordType"
+              placeholder="Password"
+              name="password"
+              tabindex="2"
+              auto-complete="on"
+              @keyup.enter.native="handleLogin"
+            />
+          </el-col>
+          <el-col :span="5">
+            <span class="show-pwd" @click="showPwd">
+              <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+            </span>
+          </el-col>
+        </el-row>
+
       </el-form-item>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
+      <el-button
+        :loading="loading"
+        type="primary"
+        style="width:100%;margin:30px 0 0;border-radius:7px;"
+        @click.native.prevent="handleLogin"
+      >
+        登入
+      </el-button>
       <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
+        <span style="margin-right:20px;" />
+        <span />
       </div>
 
     </el-form>
@@ -60,22 +89,22 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('请输入正确的用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('密码长度不可以少于6位'))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -83,7 +112,8 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      select: 'admin'
     }
   },
   watch: {
@@ -109,6 +139,7 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+          this.loginForm.type = this.select
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
@@ -129,7 +160,7 @@ export default {
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
+$bg: rgba(255,255,255,0.1);
 $light_gray:#fff;
 $cursor: #fff;
 
@@ -143,8 +174,6 @@ $cursor: #fff;
 .login-container {
   .el-input {
     display: inline-block;
-    height: 47px;
-    width: 85%;
 
     input {
       background: transparent;
@@ -155,43 +184,64 @@ $cursor: #fff;
       color: $light_gray;
       height: 47px;
       caret-color: $cursor;
-
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
+      &:-webkit-autofill,
+      :-webkit-autofill:hover,
+      :-webkit-autofill:focus,
+      :-webkit-autofill:active {
+        transition-delay: 99999s;
+        transition: color 99999s ease-out, background-color 99999s ease-out;
       }
     }
   }
 
   .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
+    border-radius: 15px;
+    color: #fafafa;
   }
 }
 </style>
 
 <style lang="scss" scoped>
 $bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$dark_gray:#fefefe;
+$light_gray:#fefefe;
 
 .login-container {
   min-height: 100%;
   width: 100%;
-  background-color: $bg;
+  background: url('../../assets/background/login.jpg') no-repeat center center fixed;
   overflow: hidden;
-
   .login-form {
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 160px 35px 0;
-    margin: 0 auto;
+    padding: 50px 55px;
+    margin: 200px auto;
+    z-index: 0;
     overflow: hidden;
+    border-radius: 30px;
+    box-shadow: 2px 1px 6px #808589;
+    &::before {
+      content: "";/* 必须包括 */
+      position: absolute;/* 固定模糊层位置 */
+      width:300%;
+      height:300%;
+      left: -100%;/* 回调模糊层位置 */
+      top: -100%;/* 回调模糊层位置 */
+      background: url('../../assets/background/login.jpg') no-repeat center center fixed;/* 与上面的bg中的background设置一样 */
+      filter: blur(2px);/* 值越大越模糊 */
+      z-index: -2;/* 模糊层在最下面 */
+    }
+    .loginForm-rgba{
+      background-color: rgba(255, 255, 255, 0.2);/* 为文字更好显示，将背景颜色加深 */
+      position: absolute;/* 固定半透明色层位置 */
+      width:300%;
+      height:300%;
+       left: -100%;
+      top: -100%;
+      z-index: -1;/* 中间是rgba半透明色层 */
+    }
   }
-
   .tips {
     font-size: 14px;
     color: #fff;
@@ -229,9 +279,15 @@ $light_gray:#eee;
     right: 10px;
     top: 7px;
     font-size: 16px;
-    color: $dark_gray;
+    color: #fafafa;
     cursor: pointer;
     user-select: none;
   }
+}
+.login-form .el-form-item__error {
+  left: 50px;
+}
+.userselect .el-input {
+  width: auto;
 }
 </style>

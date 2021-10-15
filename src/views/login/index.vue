@@ -68,15 +68,24 @@
         :loading="loading"
         type="primary"
         style="width:100%;margin:30px 0 0;border-radius:7px;"
-        @click.native.prevent="handleLogin"
+        :disabled="loading"
+        @click.native="handleLogin"
       >
-        登入
+        {{ loading ? '' : '登入' }}
       </el-button>
-      <div class="tips">
-        <span style="margin-right:20px;" />
-        <span />
+      <div
+        class="tips"
+        style="margin:10px 0;"
+      >
+        <span>
+          还没有账号？<el-button
+            type="text"
+            class="join_us"
+            style="padding: 0;"
+            @click.native="join"
+          >加入我们</el-button>
+        </span>
       </div>
-
     </el-form>
   </div>
 </template>
@@ -151,6 +160,9 @@ export default {
           return false
         }
       })
+    },
+    join() {
+      this.$router.push({ path: '/register' })
     }
   }
 }
@@ -220,7 +232,7 @@ $light_gray:#fefefe;
     z-index: 0;
     overflow: hidden;
     border-radius: 30px;
-    box-shadow: 2px 1px 6px #808589;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
     &::before {
       content: "";/* 必须包括 */
       position: absolute;/* 固定模糊层位置 */
@@ -229,7 +241,7 @@ $light_gray:#fefefe;
       left: -100%;/* 回调模糊层位置 */
       top: -100%;/* 回调模糊层位置 */
       background: url('../../assets/background/login.jpg') no-repeat center center fixed;/* 与上面的bg中的background设置一样 */
-      filter: blur(2px);/* 值越大越模糊 */
+      filter: blur(10px);/* 值越大越模糊 */
       z-index: -2;/* 模糊层在最下面 */
     }
     .loginForm-rgba{
@@ -289,5 +301,14 @@ $light_gray:#fefefe;
 }
 .userselect .el-input {
   width: auto;
+}
+.join_us {
+  color: #266aad;
+  display: inline-block;
+  cursor: pointer;
+  &:hover{
+    color: #409EFF;
+    text-decoration-line: underline;
+  }
 }
 </style>
